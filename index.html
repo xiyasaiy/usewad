@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5, viewport-fit=cover">
+  <title>🍮 布丁取名铺 </title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #fff9e6;
+      background-image: radial-gradient(circle at 15% 25%, #ffeacb 2%, transparent 3%),
+                        radial-gradient(circle at 85% 65%, #ffdbb5 3%, transparent 4%),
+                        radial-gradient(circle at 35% 85%, #ffe0b0 2%, transparent 3%);
+      background-size: 70px 70px, 90px 90px, 110px 110px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      padding: 1rem;
+    }
+    .game-container {
+      max-width: 700px;
+      width: 100%;
+      background: #fffef7;
+      border-radius: 3rem;
+      box-shadow: 0 20px 40px rgba(255, 180, 70, 0.3);
+      padding: 2rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      border: 3px solid #ffe3a3;
+      position: relative;
+    }
+    .game-container::before {
+      content: "🍮";
+      position: absolute;
+      top: -15px;
+      left: -10px;
+      font-size: 2.5rem;
+      transform: rotate(-12deg);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .game-container::after {
+      content: "🍯";
+      position: absolute;
+      bottom: -15px;
+      right: -10px;
+      font-size: 2.3rem;
+      transform: rotate(10deg);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #c27e3a;
+      text-shadow: 2px 2px 0 #ffe5b9;
+      background: #fff2d7;
+      padding: 0.4rem 2rem;
+      border-radius: 3rem;
+      border: 2px dashed #fccf8f;
+    }
+
+    /* 通用姓氏库 */
+    .surname-section {
+      width: 100%;
+      background: #fff9ed;
+      border-radius: 2rem;
+      padding: 1rem 1.2rem;
+      border: 2px solid #ffe1a4;
+    }
+    .surname-section h2 {
+      color: #b4762c;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .surname-section textarea {
+      width: 100%;
+      height: 80px;
+      border-radius: 1.5rem;
+      border: 2px solid #f7cd8c;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      resize: vertical;
+      background: #fffef5;
+    }
+    .surname-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    /* 男女名字库并排 */
+    .name-panels {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .name-panel {
+      flex: 1;
+      min-width: 180px;
+      background: #fff9ed;
+      border-radius: 2rem;
+      padding: 1rem;
+      border: 2px solid #ffe1a4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .name-panel.female {
+      background: #fff5f7;
+      border-color: #ffccd5;
+    }
+    .name-panel.male {
+      background: #f5f9ff;
+      border-color: #cce0ff;
+    }
+    .name-panel h2 {
+      font-size: 1.2rem;
+      color: #b4762c;
+      margin-bottom: 0.5rem;
+    }
+    .name-panel textarea {
+      width: 100%;
+      height: 100px;
+      border-radius: 1.5rem;
+      border: 2px solid #f7cd8c;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      resize: vertical;
+      background: #fffef5;
+    }
+    .name-actions {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.4rem;
+    }
+
+    /* 结果显示 */
+    .result-box {
+      background: #fff7e6;
+      padding: 1.2rem;
+      border-radius: 2.5rem;
+      text-align: center;
+      width: 100%;
+      border: 2px dashed #fdcb77;
+    }
+    #displayName {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #9b5e2c;
+      text-shadow: 2px 2px 0 #ffd58c;
+      letter-spacing: 4px;
+      transition: all 0.2s;
+    }
+    .gender-tag {
+      display: inline-block;
+      padding: 0.2rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .gender-tag.female {
+      background: #ffe0e5;
+      color: #c44;
+    }
+    .gender-tag.male {
+      background: #dceeff;
+      color: #36c;
+    }
+
+    /* 按钮 */
+    .btn-row {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      font-size: 1rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: 3rem;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      transition: all 0.08s;
+      touch-action: manipulation;
+    }
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.15);
+    }
+    .btn-female {
+      background: #ffb3c1;
+      color: #5c1a2a;
+    }
+    .btn-male {
+      background: #a3c9ff;
+      color: #1a2a5c;
+    }
+    .btn-reset {
+      background: #ffe4ba;
+      color: #5c3b19;
+    }
+    .small-btn {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.8rem;
+      background: #fff2d7;
+      border: 2px solid #f7c470;
+      color: #6b3f18;
+      box-shadow: 0 2px 0 #e0af5a;
+    }
+
+    .footer-note {
+      color: #c4904b;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <h1>🍮 布丁取名铺 🐣</h1>
+
+  <!-- 通用姓氏库 -->
+  <div class="surname-section">
+    <h2>📜 通用姓氏库</h2>
+    <textarea id="surnameBox" placeholder="每行一个姓氏">王
+李
+张
+陈
+刘
+杨
+黄
+赵
+周
+吴</textarea>
+    <div class="surname-actions">
+      <button class="small-btn" onclick="addItem('surname')">➕ 添加姓氏</button>
+      <button class="small-btn" onclick="clearLib('surname')">🗑️ 清空</button>
+    </div>
+  </div>
+
+  <!-- 男女名字库 -->
+  <div class="name-panels">
+    <!-- 女生名字库 -->
+    <div class="name-panel female">
+      <h2>🌸 女生名字单字库</h2>
+      <textarea id="femaleBox" placeholder="每行一个单字">梦
+琪
+瑶
+若
+汐
+涵
+婉
+婷
+柔
+嫣</textarea>
+      <div class="name-actions">
+        <button class="small-btn" onclick="addItem('female')">➕ 添加</button>
+        <button class="small-btn" onclick="clearLib('female')">🗑️ 清空</button>
+      </div>
+    </div>
+    <!-- 男生名字库 -->
+    <div class="name-panel male">
+      <h2>⭐ 男生名字单字库</h2>
+      <textarea id="maleBox" placeholder="每行一个单字">泽
+宇
+然
+沐
+轩
+铭
+哲
+皓
+辰
+逸</textarea>
+      <div class="name-actions">
+        <button class="small-btn" onclick="addItem('male')">➕ 添加</button>
+        <button class="small-btn" onclick="clearLib('male')">🗑️ 清空</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结果显示 -->
+  <div class="result-box">
+    <div id="genderTag" class="gender-tag female">🌸 女生</div>
+    <div id="displayName">王梦琪</div>
+  </div>
+
+  <!-- 随机按钮 -->
+  <div class="btn-row">
+    <button class="btn-female" onclick="shakeFemale()">🎀 随机女生名</button>
+    <button class="btn-male" onclick="shakeMale()">🌟 随机男生名</button>
+    <button class="btn-reset" onclick="resetDefault()">🔄 恢复默认</button>
+  </div>
+  <div class="footer-note">💾 所有修改自动保存 · 点击按钮随机生成</div>
+</div>
+
+<script>
+  // ========== 工具函数 ==========
+  function getArrayFromBox(id) {
+    const text = document.getElementById(id).value;
+    return text.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+  }
+
+  function saveAll() {
+    const data = {
+      surnames: getArrayFromBox('surnameBox'),
+      female: getArrayFromBox('femaleBox'),
+      male: getArrayFromBox('maleBox')
+    };
+    localStorage.setItem('pudding_name_data', JSON.stringify(data));
+  }
+
+  function loadAll() {
+    const saved = localStorage.getItem('pudding_name_data');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        if (data.surnames) document.getElementById('surnameBox').value = data.surnames.join('\n');
+        if (data.female) document.getElementById('femaleBox').value = data.female.join('\n');
+        if (data.male) document.getElementById('maleBox').value = data.male.join('\n');
+      } catch (e) {}
+    }
+  }
+
+  // 自动保存
+  document.addEventListener('input', saveAll);
+
+  // ========== 随机生成 ==========
+  function randomName(gender) {
+    const surnames = getArrayFromBox('surnameBox');
+    const nameChars = getArrayFromBox(gender === 'female' ? 'femaleBox' : 'maleBox');
+    
+    if (surnames.length === 0) return '❌ 请添加姓氏';
+    if (nameChars.length === 0) return '❌ 请添加名字单字';
+    
+    const surname = surnames[Math.floor(Math.random() * surnames.length)];
+    let given;
+    
+    if (nameChars.length === 1) {
+      given = nameChars[0];
+    } else {
+      if (Math.random() < 0.5) {
+        given = nameChars[Math.floor(Math.random() * nameChars.length)];
+      } else {
+        const a = nameChars[Math.floor(Math.random() * nameChars.length)];
+        const b = nameChars[Math.floor(Math.random() * nameChars.length)];
+        given = a + b;
+      }
+    }
+    
+    return surname + given;
+  }
+
+  function updateDisplay(name, gender) {
+    document.getElementById('displayName').textContent = name;
+    const tag = document.getElementById('genderTag');
+    if (gender === 'female') {
+      tag.textContent = '🌸 女生';
+      tag.className = 'gender-tag female';
+    } else {
+      tag.textContent = '⭐ 男生';
+      tag.className = 'gender-tag male';
+    }
+    // 动画
+    const el = document.getElementById('displayName');
+    el.style.transform = 'scale(1.15)';
+    setTimeout(() => el.style.transform = 'scale(1)', 150);
+    saveAll();
+  }
+
+  function shakeFemale() {
+    const name = randomName('female');
+    updateDisplay(name, 'female');
+  }
+
+  function shakeMale() {
+    const name = randomName('male');
+    updateDisplay(name, 'male');
+  }
+
+  // ========== 添加/清空 ==========
+  function addItem(type) {
+    let boxId, libName;
+    if (type === 'surname') { boxId = 'surnameBox'; libName = '姓氏'; }
+    else if (type === 'female') { boxId = 'femaleBox'; libName = '女生名字单字'; }
+    else { boxId = 'maleBox'; libName = '男生名字单字'; }
+    
+    const input = prompt(`请输入要添加的${libName}：`);
+    if (!input) return;
+    const trimmed = input.trim();
+    if (!trimmed) { alert('输入不能为空'); return; }
+    
+    const arr = getArrayFromBox(boxId);
+    arr.push(trimmed);
+    document.getElementById(boxId).value = arr.join('\n');
+    saveAll();
+  }
+
+  function clearLib(type) {
+    let boxId, libName;
+    if (type === 'surname') { boxId = 'surnameBox'; libName = '姓氏库'; }
+    else if (type === 'female') { boxId = 'femaleBox'; libName = '女生名字库'; }
+    else { boxId = 'maleBox'; libName = '男生名字库'; }
+    
+    if (confirm(`确定要清空${libName}吗？`)) {
+      document.getElementById(boxId).value = '';
+      saveAll();
+    }
+  }
+
+  // ========== 恢复默认 ==========
+  function resetDefault() {
+    if (confirm('确定恢复默认姓名库吗？当前修改将丢失。')) {
+      document.getElementById('surnameBox').value = '王\n李\n张\n陈\n刘\n杨\n黄\n赵\n周\n吴';
+      document.getElementById('femaleBox').value = '梦\n琪\n瑶\n若\n汐\n涵\n婉\n婷\n柔\n嫣';
+      document.getElementById('maleBox').value = '泽\n宇\n然\n沐\n轩\n铭\n哲\n皓\n辰\n逸';
+      saveAll();
+      shakeFemale(); // 默认显示女生名
+    }
+  }
+
+  // ========== 初始化 ==========
+  function init() {
+    loadAll();
+    // 默认显示一个女生名
+    const name = randomName('female');
+    updateDisplay(name, 'female');
+  }
+
+  window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
